@@ -1,0 +1,31 @@
+{
+  "name": "lagrange-data-lib",
+  "version": "1.0.0",
+  "description": "NPM package wrapper for request-laurent/lagrange-data",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc --build",
+    "download-raw-data": "ts-node script/downloadRawData.ts",
+    "properties-to-json": "ts-node script/propertiesToJson.ts",
+    "validate-schema": "ts-node script/validateSchema.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yosuzuk/lagrange-data-lib.git"
+  },
+  "author": "ysuzuk",
+  "license": "MIT",
+  "devDependencies": {
+    "@tsconfig/recommended": "1.0.2",
+    "@types/lodash": "4.14.195",
+    "@types/node": "18.14.0",
+    "@types/progress": "2.0.5",
+    "esbuild": "0.17.10",
+    "lodash": "4.17.21",
+    "progress": "2.0.3",
+    "ts-node": "10.9.1",
+    "typescript": "4.9.5",
+    "wget-improved": "3.3.1",
+    "zod": "3.21.4"
+  }
+}
