@@ -80,10 +80,10 @@ function convertEnhancement(enhancement: RawEnhancement) {
         translatedDescription: {
             en: _.get(i18nEn, enhancement.description)
         },
-        detail: _.get(i18nJa, enhancement.detail),
-        translatedDetail: {
-            en: _.get(i18nEn, enhancement.detail),
-        },
+        // detail: _.get(i18nJa, enhancement.detail),
+        // translatedDetail: {
+        //     en: _.get(i18nEn, enhancement.detail),
+        // },
         cost: enhancement.techs.length > 0 ? enhancement.techs.reduce((sum, i) => sum + i, 0) : null,
         isDefault: enhancement.techs.length === 0,
     } as const;
