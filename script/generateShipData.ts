@@ -1,11 +1,14 @@
+import path from 'path';
 import _ from 'lodash';
 import ships from './data/raw/ships.json';
 import i18nEn from './data/generated/i18n_en.json';
 import i18nJa from './data/generated/i18n_ja.json';
 import { RawEnhancement, RawShips, RawSystem } from './types';
+import { writeDirectory, writeFile } from './writeFile';
+import { config } from './config';
 
 async function main() {
-    const shipId = 50603;
+    const shipId = 80301;
     const ship = (ships as RawShips).find(ship => ship.id === shipId);
     if (!ship) {
         throw new Error('Invalid ship id');
@@ -49,7 +52,13 @@ async function main() {
         }),
     };
 
-    console.log(JSON.stringify(output, null, 2));
+    // console.log(JSON.stringify(output, null, 2));
+
+    const fileName = `${_.get(i18nEn, ship.shortName).replace(/\s+/g, '_')}_${_.get(i18nEn, ship.typeName).replace(/\s+/g, '_')}.json`;
+    const outputDir = path.join(process.cwd(), config.outDirGenerated, 'ships');
+    await writeDirectory(outputDir);
+    const outputPath = path.join(outputDir, fileName);
+    await writeFile(JSON.stringify(output, null, 2), outputPath);
 }
 
 function convertEnhancement(enhancement: RawEnhancement) {
@@ -97,8 +106,7 @@ function toFullWidth(str: string): string {
       return String.fromCharCode(s.charCodeAt(0) + 0xFEE0);
     });
     return str;
-  }
-  
+}
 
 main().then(() => {
     console.log('Done');

@@ -8,7 +8,8 @@
     "download-raw-data": "ts-node script/downloadRawData.ts",
     "properties-to-json": "ts-node script/propertiesToJson.ts",
     "validate-schema": "ts-node script/validateSchema.ts",
-    "view-ship-data": "ts-node script/viewShipData.ts"
+    "generate-ship-list": "ts-node script/generateShipList.ts",
+    "generate-ship-data": "ts-node script/generateShipData.ts"
   },
   "repository": {
     "type": "git",
