@@ -3,62 +3,71 @@ import _ from 'lodash';
 import ships from './data/raw/ships.json';
 import i18nEn from './data/generated/i18n_en.json';
 import i18nJa from './data/generated/i18n_ja.json';
-import { RawEnhancement, RawShips, RawSystem } from './types';
+import { RawEnhancement, RawShip, RawShips, RawSystem } from './types';
 import { writeDirectory, writeFile } from './writeFile';
 import { config } from './config';
 
 async function main() {
     const shipId = 80301;
-    const ship = (ships as RawShips).find(ship => ship.id === shipId);
-    if (!ship) {
-        throw new Error('Invalid ship id');
-    }
 
-    const output = {
-        name: `${_.get(i18nJa, ship.shortName)}　${toFullWidth(ship.variante)}${_.get(i18nJa, ship.typeName)}`,
+    for (const ship of (ships as RawShips)) {
+        try {
+            const name = getName(ship);
+
+            const output = {
+                ...name,
+                cost: ship.commandPoint,
+                row: parseRow(ship.row),
+                operationLimit: ship.maxShip > 0 ? ship.maxShip : 'TODO',
+                modules: ship.systems.map(system => {
+                    return {
+                        id: `${system.id}`,
+                        name: _.get(i18nJa, system.name),
+                        translatedName: {
+                            en: _.get(i18nEn, system.name),
+                        },
+                        // description
+                        // parts
+                        category: extractCategory(system),
+                        categoryNumber: extractCategoryNumber(system),
+                        // carryFighter?: number;
+                        // carryCorvette?: number;
+                        // carryFighterType?: ShipSubType.SMALL_FIGHTER | ShipSubType.MEDIUM_FIGHTER | ShipSubType.LARGE_FIGHTER;
+                        defaultModule: !system.option,
+                        mainSystem: system.main,
+                        effects: system.enhancements.filter(e => !e.flagShip && e.techs.length === 0).map(convertEnhancement),
+                        skillComplete: true,
+                        skillSlots: system.enhancementsLimit,
+                        skills: system.enhancements.filter(e => !e.flagShip && e.techs.length > 0).map(convertEnhancement),
+                        flagshipEffects: system.enhancements.filter(e => e.flagShip).map(convertEnhancement),
+                        // dpmShip?: number;
+                        // dpmAntiAir?: number;
+                        // dpmSiege?: number;
+                    };
+                }),
+            };
+
+            const fileName = `${name.name}.json`;
+            const outputDir = path.join(process.cwd(), config.outDirGenerated, 'ships');
+            await writeDirectory(outputDir);
+            const outputPath = path.join(outputDir, fileName);
+            await writeFile(JSON.stringify(output, null, 2), outputPath);
+            console.log('Write ' + fileName);
+        } catch (e) {
+            console.error(`Failed for ${ship.id}, `, e);
+        }
+    }
+}
+
+function getName(ship: RawShip) {
+    return {
+        name: `${_.get(i18nJa, ship.shortName) ?? '???'}　${toFullWidth(ship.variante ?? '')}${_.get(i18nJa, ship.typeName) ?? ''}`,
         // longName: _.get(i18nJa, ship.name),
         translatedName: {
-            en: `${_.get(i18nEn, ship.shortName)} - ${_.get(i18nEn, ship.typeName)}`,
+            en: `${_.get(i18nEn, ship.shortName) ?? '???'}${_.get(i18nEn, ship.typeName) ? `- ${_.get(i18nEn, ship.typeName)}` : ''}`,
             // longEn: _.get(i18nEn, ship.name),
         },
-        cost: ship.commandPoint,
-        row: parseRow(ship.row),
-        operationLimit: ship.maxShip > 0 ? ship.maxShip : 'TODO',
-        modules: ship.systems.map(system => {
-            return {
-                id: `${system.id}`,
-                name: _.get(i18nJa, system.name),
-                translatedName: {
-                    en: _.get(i18nEn, system.name),
-                },
-                // description
-                // parts
-                category: extractCategory(system),
-                categoryNumber: extractCategoryNumber(system),
-                // carryFighter?: number;
-                // carryCorvette?: number;
-                // carryFighterType?: ShipSubType.SMALL_FIGHTER | ShipSubType.MEDIUM_FIGHTER | ShipSubType.LARGE_FIGHTER;
-                defaultModule: !system.option,
-                mainSystem: system.main,
-                effects: system.enhancements.filter(e => !e.flagShip && e.techs.length === 0).map(convertEnhancement),
-                skillComplete: true,
-                skillSlots: system.enhancementsLimit,
-                skills: system.enhancements.filter(e => !e.flagShip && e.techs.length > 0).map(convertEnhancement),
-                flagshipEffects: system.enhancements.filter(e => e.flagShip).map(convertEnhancement),
-                // dpmShip?: number;
-                // dpmAntiAir?: number;
-                // dpmSiege?: number;
-            };
-        }),
     };
-
-    // console.log(JSON.stringify(output, null, 2));
-
-    const fileName = `${_.get(i18nEn, ship.shortName).replace(/\s+/g, '_')}_${_.get(i18nEn, ship.typeName).replace(/\s+/g, '_')}.json`;
-    const outputDir = path.join(process.cwd(), config.outDirGenerated, 'ships');
-    await writeDirectory(outputDir);
-    const outputPath = path.join(outputDir, fileName);
-    await writeFile(JSON.stringify(output, null, 2), outputPath);
 }
 
 function convertEnhancement(enhancement: RawEnhancement) {
