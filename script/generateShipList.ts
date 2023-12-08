@@ -12,9 +12,13 @@ async function main() {
     const output = (ships as RawShips).map(ship => {
         return {
             id: ship.id,
+            longName: _.get(i18nJa, ship.name),
             name: `${_.get(i18nJa, ship.shortName)}　${toFullWidth(ship.variante)}${_.get(i18nJa, ship.typeName)}`,
             translatedName: {
-                en: `${_.get(i18nEn, ship.shortName)} - ${_.get(i18nEn, ship.typeName)}`,    
+                en: `${_.get(i18nEn, ship.shortName)} - ${_.get(i18nEn, ship.typeName)}`,
+            },
+            translatedLongName: {
+                en: _.get(i18nEn, ship.name),
             },
         };
     });

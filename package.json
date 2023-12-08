@@ -9,7 +9,8 @@
     "properties-to-json": "ts-node script/propertiesToJson.ts",
     "validate-schema": "ts-node script/validateSchema.ts",
     "generate-ship-list": "ts-node script/generateShipList.ts",
-    "generate-ship-data": "ts-node script/generateShipData.ts"
+    "generate-ship-data": "ts-node script/generateShipData.ts",
+    "generate-short-ship-name-list": "ts-node script/generateShortShipNameList.ts"
   },
   "repository": {
     "type": "git",
